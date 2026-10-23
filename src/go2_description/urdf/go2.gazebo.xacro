@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Gazebo-only extensions: ros2_control plugin and contact properties. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="go2_gazebo" params="controllers_file">
+
+    <gazebo>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>${controllers_file}</parameters>
+      </plugin>
+    </gazebo>
+
+    <!-- Feet: rubber-like friction, stiff but damped contact so the robot doesn't bounce. -->
+    <xacro:macro name="go2_foot_contact" params="leg">
+      <gazebo reference="${leg}_foot">
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
+        <kp>1.0e6</kp>
+        <kd>100.0</kd>
+        <minDepth>0.001</minDepth>
+        <maxVel>0.1</maxVel>
+      </gazebo>
+    </xacro:macro>
+    <xacro:go2_foot_contact leg="FL"/>
+    <xacro:go2_foot_contact leg="FR"/>
+    <xacro:go2_foot_contact leg="RL"/>
+    <xacro:go2_foot_contact leg="RR"/>
+
+  </xacro:macro>
+</robot>

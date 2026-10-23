@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Top-level Unitree Go2 description.
+     sim:=true adds the ros2_control interface and the Gazebo plugins;
+     controllers_file is the ros2_control parameters YAML handed to gz_ros2_control. -->
+<robot name="go2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="sim" default="false"/>
+  <xacro:arg name="controllers_file" default=""/>
+
+  <xacro:include filename="$(find go2_description)/urdf/go2_body.xacro"/>
+  <xacro:go2_body/>
+
+  <xacro:if value="$(arg sim)">
+    <xacro:include filename="$(find go2_description)/urdf/go2.ros2_control.xacro"/>
+    <xacro:include filename="$(find go2_description)/urdf/go2.gazebo.xacro"/>
+    <xacro:go2_ros2_control/>
+    <xacro:go2_gazebo controllers_file="$(arg controllers_file)"/>
+  </xacro:if>
+</robot>

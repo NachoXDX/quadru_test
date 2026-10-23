@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- ros2_control interface: 12 position-commanded joints, simulated by gz_ros2_control. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Lying pose (body resting on the ground), used as the initial joint state in Gazebo. -->
+  <xacro:property name="lie_thigh" value="1.36"/>
+  <xacro:property name="lie_calf" value="-2.65"/>
+
+  <xacro:macro name="go2_joint" params="name initial">
+    <joint name="${name}">
+      <command_interface name="position"/>
+      <state_interface name="position">
+        <param name="initial_value">${initial}</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="go2_ros2_control">
+    <ros2_control name="go2_system" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      <xacro:macro name="go2_leg_joints" params="leg">
+        <xacro:go2_joint name="${leg}_hip_joint" initial="0.0"/>
+        <xacro:go2_joint name="${leg}_thigh_joint" initial="${lie_thigh}"/>
+        <xacro:go2_joint name="${leg}_calf_joint" initial="${lie_calf}"/>
+      </xacro:macro>
+      <xacro:go2_leg_joints leg="FL"/>
+      <xacro:go2_leg_joints leg="FR"/>
+      <xacro:go2_leg_joints leg="RL"/>
+      <xacro:go2_leg_joints leg="RR"/>
+    </ros2_control>
+  </xacro:macro>
+</robot>
