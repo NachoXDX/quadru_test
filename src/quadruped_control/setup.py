@@ -11,6 +11,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
+    extras_require={'test': ['pytest']},
     zip_safe=True,
     maintainer='Nacho',
     maintainer_email='rubiolopedroignacio@gmail.com',
@@ -18,6 +19,8 @@ setup(
     license='Apache-2.0',
     entry_points={
         'console_scripts': [
+            'joy_actions_node = quadruped_control.joy_actions_node:main',
+            'noisy_odom_node = quadruped_control.noisy_odom_node:main',
             'posture_node = quadruped_control.posture_node:main',
         ],
     },

@@ -1,19 +1,50 @@
 <?xml version="1.0"?>
-<!-- Gazebo-only extensions: ros2_control plugin and contact properties. -->
+<!-- Gazebo-only extensions: ros2_control plugin, contact properties,
+     ground-truth odometry and (cheat:=true) the planar body driver. -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="go2_gazebo" params="controllers_file">
+  <xacro:macro name="go2_gazebo" params="controllers_file cheat">
 
     <gazebo>
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>${controllers_file}</parameters>
       </plugin>
+
+      <!-- Perfect odometry straight from the simulator, for comparison only. -->
+      <plugin filename="gz-sim-odometry-publisher-system"
+              name="gz::sim::systems::OdometryPublisher">
+        <odom_frame>odom</odom_frame>
+        <robot_base_frame>base_link</robot_base_frame>
+        <odom_topic>/model/go2/ground_truth/odom</odom_topic>
+        <tf_topic>/model/go2/ground_truth/tf</tf_topic>
+        <odom_publish_frequency>50</odom_publish_frequency>
+        <dimensions>3</dimensions>
+      </plugin>
     </gazebo>
 
-    <!-- Feet: rubber-like friction, stiff but damped contact so the robot doesn't bounce. -->
+    <xacro:if value="${cheat}">
+      <!-- Cheat locomotion: an invisible horizontal push tracking /cmd_vel.
+           See quadruped_gz_plugins/src/planar_body_driver.cpp. -->
+      <gazebo>
+        <plugin filename="PlanarBodyDriver" name="quadruped_gz_plugins::PlanarBodyDriver">
+          <topic>/cmd_vel</topic>
+          <!-- Proportional gains: force = gain * velocity error. Higher = less lag and
+               less steady-state error against foot friction, but a harder push. -->
+          <linear_gain>800</linear_gain>      <!-- N per m/s -->
+          <angular_gain>80</angular_gain>     <!-- N*m per rad/s -->
+          <max_force>150</max_force>          <!-- N -->
+          <max_torque>30</max_torque>         <!-- N*m -->
+          <cmd_timeout>0.5</cmd_timeout>      <!-- s: stop if /cmd_vel goes quiet -->
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+    <!-- Feet: rubber-like friction, stiff but damped contact so the robot doesn't bounce.
+         In cheat mode the feet are slippery so they glide instead of dragging. -->
+    <xacro:property name="foot_mu" value="${0.1 if cheat else 1.0}"/>
     <xacro:macro name="go2_foot_contact" params="leg">
       <gazebo reference="${leg}_foot">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>${foot_mu}</mu1>
+        <mu2>${foot_mu}</mu2>
         <kp>1.0e6</kp>
         <kd>100.0</kd>
         <minDepth>0.001</minDepth>

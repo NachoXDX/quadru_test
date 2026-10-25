@@ -1,0 +1,35 @@
+# PS5 DualSense via joy's game_controller_node (SDL standard gamepad layout).
+# Check the indices with `ros2 topic echo /joy` if a stick or button seems wrong.
+#   axes:    0 left X (left = +), 1 left Y (up = +), 2 right X, 3 right Y, 4 L2, 5 R2
+#   buttons: 0 Cross, 1 Circle, 2 Square, 3 Triangle, 4 Create, 5 PS, 6 Options,
+#            7 L3, 8 R3, 9 L1, 10 R1, 11-14 D-pad up/down/left/right
+game_controller_node:
+  ros__parameters:
+    deadzone: 0.08
+    autorepeat_rate: 20.0   # keep publishing while a stick is held (cmd_vel timeout is 0.5 s)
+
+teleop_twist_joy_node:
+  ros__parameters:
+    require_enable_button: true
+    enable_button: 9          # hold L1 to move (dead-man switch)
+    enable_turbo_button: 10   # hold R1 as well for full speed
+    axis_linear:
+      x: 1                    # left stick up/down: forward/backward
+      y: 2                    # right stick left/right: sideways
+    scale_linear:
+      x: 0.5
+      y: 0.3
+    scale_linear_turbo:
+      x: 1.0
+      y: 0.5
+    axis_angular:
+      yaw: 0                  # left stick left/right: turn
+    scale_angular:
+      yaw: 1.0
+    scale_angular_turbo:
+      yaw: 1.5
+
+joy_actions_node:
+  ros__parameters:
+    stand_button: 0           # Cross
+    lie_button: 1             # Circle

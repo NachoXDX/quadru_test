@@ -16,7 +16,8 @@
 
 LEGS = ('FL', 'FR', 'RL', 'RR')
 
-# Same order as forward_position_controller's `joints` in quadruped_bringup/config/controllers.yaml.
+# Same order as forward_position_controller's `joints` in
+# quadruped_bringup/config/controllers.yaml.
 JOINT_NAMES = tuple(
     f'{leg}_{joint}_joint' for leg in LEGS for joint in ('hip', 'thigh', 'calf'))
 

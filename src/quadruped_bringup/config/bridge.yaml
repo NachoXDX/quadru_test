@@ -4,3 +4,17 @@
   ros_type_name: rosgraph_msgs/msg/Clock
   gz_type_name: gz.msgs.Clock
   direction: GZ_TO_ROS
+
+# Velocity commands for the cheat body driver (PlanarBodyDriver plugin).
+- ros_topic_name: /cmd_vel
+  gz_topic_name: /cmd_vel
+  ros_type_name: geometry_msgs/msg/Twist
+  gz_type_name: gz.msgs.Twist
+  direction: ROS_TO_GZ
+
+# Perfect odometry from the simulator (comparison only; its TF is not bridged).
+- ros_topic_name: /ground_truth/odom
+  gz_topic_name: /model/go2/ground_truth/odom
+  ros_type_name: nav_msgs/msg/Odometry
+  gz_type_name: gz.msgs.Odometry
+  direction: GZ_TO_ROS

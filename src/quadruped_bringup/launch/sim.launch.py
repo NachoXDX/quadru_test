@@ -33,6 +33,7 @@ def generate_launch_description():
 
     world = LaunchConfiguration('world')
     rviz = LaunchConfiguration('rviz')
+    cheat = LaunchConfiguration('cheat')
     # -s runs the Gazebo server only (no GUI window), e.g. for testing.
     server_only = PythonExpression(
         ["'-s ' if '", LaunchConfiguration('headless'), "' == 'true' else ''"])
@@ -41,7 +42,7 @@ def generate_launch_description():
     robot_description = ParameterValue(
         Command([
             'xacro ', PathJoinSubstitution([description_share, 'urdf', 'go2.urdf.xacro']),
-            ' sim:=true controllers_file:=', controllers_file,
+            ' sim:=true controllers_file:=', controllers_file, ' cheat:=', cheat,
         ]),
         value_type=str,
     )
@@ -86,6 +87,10 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'world', default_value=PathJoinSubstitution([bringup_share, 'worlds', 'empty.sdf'])),
         DeclareLaunchArgument('rviz', default_value='false'),
+        DeclareLaunchArgument('cheat', default_value='true',
+                              description='Move the body with the PlanarBodyDriver push'),
+        DeclareLaunchArgument('joy', default_value='false',
+                              description='Start gamepad teleop (joy.launch.py)'),
         DeclareLaunchArgument('headless', default_value='false',
                               description='Run Gazebo without its GUI'),
         # RViz's Ogre window misbehaves under Qt HiDPI scaling (see CLAUDE.md).
@@ -109,6 +114,15 @@ def generate_launch_description():
             executable='posture_node',
             parameters=[sim_time],
             output='screen',
+        ),
+        Node(
+            package='quadruped_control',
+            executable='noisy_odom_node',
+            parameters=[sim_time],
+        ),
+        IncludeLaunchDescription(
+            PathJoinSubstitution([bringup_share, 'launch', 'joy.launch.py']),
+            condition=IfCondition(LaunchConfiguration('joy')),
         ),
         Node(
             package='rviz2',
